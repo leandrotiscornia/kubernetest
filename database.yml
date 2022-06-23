@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: database
+  labels:
+    app: database
+    role: mysql-cluster
+spec:
+  selector:
+    matchLabels:
+      app: database
+  serviceName: "mysql-database"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      containers:
+      - name: mysql-database
+        image: mysql:5.7
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "123"
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 1
+            memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-cluster
+  labels:
+    app: database
+    role: mysql-cluster
+spec:
+  selector:
+    app: database
+    role: mysql-cluster
+  ports:
+   - port: 3306
